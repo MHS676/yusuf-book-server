@@ -15,6 +15,7 @@ model Book {
   cover       String?
   createdAt   DateTime @default(now())
   pages       Page[]
+  comments    Comment[]
 }
 
 model Page {
@@ -25,4 +26,18 @@ model Page {
   book       Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   @@unique([bookId, pageNumber])
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  text      String
+  userName  String
+  bookId    String
+  book      Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  createdAt DateTime  @default(now())
+
+  @@index([bookId, parentId, createdAt])
 }
